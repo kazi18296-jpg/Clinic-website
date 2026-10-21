@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create E-Prescription | MedPulse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body style="background: #f8fafc; padding: 2rem 0;">
+
+    <div class="container" style="max-width: 860px;">
+        <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <a href="/doctor/dashboard/" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <span class="badge-tag badge-primary" style="margin: 0;">Prescription for {{ appointment.appointment_id }}</span>
+        </div>
+
+        <div class="glass-card" style="padding: 2.5rem; background: #fff;">
+            <div style="border-bottom: 2px solid #0284c7; padding-bottom: 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between;">
+                <div>
+                    <h2 style="color: #0f172a; margin: 0;">Issue Official E-Prescription</h2>
+                    <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.2rem;">Doctor: {{ appointment.doctor.name }} ({{ appointment.doctor.specialty }})</p>
+                </div>
+                <div style="text-align: right;">
+                    <strong>Patient: {{ appointment.patient_name }}</strong>
+                    <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Age: {{ appointment.patient_age }} • {{ appointment.patient_gender }}</p>
+                </div>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Clinical Diagnosis / Chief Complaints *</label>
+                    <input type="text" name="diagnosis" class="form-control" value="Consultation for: {{ appointment.symptoms|default:'General Assessment' }}" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Blood Pressure (BP)</label>
+                        <input type="text" name="bp" class="form-control" value="120/80 mmHg">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Heart Pulse Rate</label>
+                        <input type="text" name="pulse" class="form-control" value="72 bpm">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">SpO2 Oxygen Saturation</label>
+                    <input type="text" name="spo2" class="form-control" value="99%">
+                </div>
+
+                <h4 style="margin: 1.5rem 0 0.75rem 0;"><i class="fas fa-pills text-primary"></i> Prescribed Medicines</h4>
+                <div id="medicine-rows-container">
+                    <div class="form-row med-row" style="margin-bottom: 0.75rem;">
+                        <input type="text" name="med_name[]" class="form-control" placeholder="Medicine / Drug name (e.g. Tab. Paracetamol 650mg)" required style="flex: 2;">
+                        <input type="text" name="med_dosage[]" class="form-control" placeholder="Dosage (e.g. 1 tab thrice daily post food)" required style="flex: 2;">
+                        <input type="text" name="med_duration[]" class="form-control" placeholder="Duration (e.g. 5 Days)" required style="flex: 1;">
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-outline btn-sm" onclick="addMedRow()" style="margin-bottom: 1.5rem;">
+                    <i class="fas fa-plus"></i> Add Another Medicine
+                </button>
+
+                <div class="form-group">
+                    <label class="form-label">Dietary & Clinical Lifestyle Advice</label>
+                    <textarea name="advice" class="form-control" rows="3" placeholder="e.g. Take plenty of warm fluids. Avoid strenuous exercise for 3 days. Review after 7 days if fever persists."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                    <a href="/doctor/dashboard/" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-file-signature"></i> Sign & Issue E-Prescription
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function addMedRow() {
+            const container = document.getElementById('medicine-rows-container');
+            const row = document.createElement('div');
+            row.className = 'form-row med-row';
+            row.style.marginBottom = '0.75rem';
+            row.innerHTML = `
+                <input type="text" name="med_name[]" class="form-control" placeholder="Medicine name" style="flex: 2;">
+                <input type="text" name="med_dosage[]" class="form-control" placeholder="Dosage instruction" style="flex: 2;">
+                <input type="text" name="med_duration[]" class="form-control" placeholder="Duration" style="flex: 1;">
+            `;
+            container.appendChild(row);
+        }
+    </script>
+</body>
+</html>
+
